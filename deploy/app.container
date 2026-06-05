@@ -1,0 +1,5 @@
+[Container]
+Image=quay.io/yourusername/my-backend:latest
+EnvironmentFile=/etc/containers/app.env
+Network=app-network
+# We don't expose ports to the public internet here. Only Nginx can touch it.

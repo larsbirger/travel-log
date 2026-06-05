@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Design & Monorepo Blueprint Template</title>
+    <style>
+        /* --- Universal Design System Properties --- */
+        :root {
+            /* Light Mode Default (High Contrast, Accessible Blue) */
+            --primary-color: #005a9c; 
+            --text-color: #1a1a1a;
+            --bg-color: #ffffff;
+            --bg-alt: #f4f6f8;
+            --border-color: rgba(0, 0, 0, 0.15);
+            --focus-outline: #ffbf47; 
+        }
+
+        /* Dark Mode Overhauled with Low-Fatigue, Warm Green Tones.
+           Uses deep charcoal-greens (Shamrock/Emerald undertones) to minimize eye strain.
+        */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #52c47c; /* Muted Emerald for dark mode UI elements */
+                --text-color: #e2ebd5;    /* Off-white canvas with a slight warm green tint */
+                --bg-color: #0b140f;      /* Deep, low-luminance dark forest base */
+                --bg-alt: #13221a;        /* Slightly lighter slate-green for cards/sections */
+                --border-color: rgba(82, 196, 124, 0.25);
+                --focus-outline: #ffd000;
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        /* Structural Focus Indicators for Keyboard/Screen-reader Navigation */
+        *:focus-visible {
+            outline: 4px solid var(--focus-outline);
+            outline-offset: 2px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* --- Structural Layout Header --- */
+        header {
+            background-color: var(--bg-alt);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.2rem 0;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo { font-size: 1.3rem; font-weight: bold; letter-spacing: 0.5px; }
+        .nav-links { display: flex; list-style: none; gap: 1.5rem; }
+        .nav-links a { color: var(--text-color); text-decoration: none; font-weight: 500; }
+        .nav-links a:hover { text-decoration: underline; }
+
+        /* --- Core Layout Structural Grids --- */
+        section { padding: 3.5rem 0; }
+        .bg-alt { background-color: var(--bg-alt); }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .section-desc {
+            margin-bottom: 2rem;
+            max-width: 700px;
+            opacity: 0.85;
+        }
+
+        /* Flexible Container Grid: Wraps dynamically from desktop down to mobile viewports */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background: var(--bg-color);
+            padding: 1.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        .card h4 { margin-bottom: 0.5rem; font-size: 1.2rem; }
+        .card ul { margin-left: 1.25rem; margin-top: 0.5rem; }
+
+        /* --- Form Control Elements --- */
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; font-weight: bold; margin-bottom: 0.5rem; }
+        input { 
+            width: 100%; padding: 0.75rem; font-size: 1rem; 
+            border: 1px solid var(--border-color); border-radius: 4px;
+            background-color: var(--bg-color); color: var(--text-color);
+        }
+        
+        /* Interactive Buttons / Touch Target Overrides */
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: #fff !important;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            min-height: 44px; /* Matches standard touch targets across mobile OS variations */
+        }
+        @media (prefers-color-scheme: dark) {
+            .btn { color: #0b140f !important; } /* High contrast inverted text for green buttons */
+        }
+        .btn:hover { opacity: 0.9; }
+
+        /* --- Footer Structural Base --- */
+        footer {
+            background-color: var(--bg-alt);
+            padding: 2.5rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.95rem;
+        }
+        footer p { margin-bottom: 0.75rem; }
+        footer a { color: var(--primary-color); text-decoration: none; font-weight: bold; }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <a href="#main-content" style="position: absolute; left: -10000px; background: var(--primary-color); color: white; padding: 1rem; z-index: 99;" onfocus="this.style.left='0'" onblur="this.style.left='-10000px'">
+        Skip to main content
+    </a>
+
+    <header>
+        <div class="container">
+            <nav aria-label="Main Infrastructure Navigation">
+                <div class="logo">SystemTemplate</div>
+                <ul class="nav-links">
+                    <li><a href="#specifications">A11y Reference</a></li>
+                    <li><a href="#data-endpoint">Form Payload</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content">
+        
+        <section class="container" id="specifications">
+            <h2 class="section-title">Universal Design Index</h2>
+            <p class="section-desc">This layout acts as a permanent boilerplate configuration. It complies with modern structural and high-contrast styling guides. Below are structural reference points for building extended components:</p>
+            
+            <div class="grid">
+                <article class="card">
+                    <h4>🔗 Core Specification Links</h4>
+                    <p>Use these verified design systems for extending code bases or verification testing:</p>
+                    <ul>
+                        <li><a href="https://www.w3.org/WAI/tutorials/" rel="noopener" target="_blank">W3C WAI Tutorials</a></li>
+                        <li><a href="https://inclusive-components.design/" rel="noopener" target="_blank">Inclusive Components</a></li>
+                        <li><a href="https://design-system.service.gov.uk/" rel="noopener" target="_blank">UK GDS Design Framework</a></li>
+                    </ul>
+                </article>
+
+                <article class="card">
+                    <h4>🛠️ Architecture Rules</h4>
+                    <p>When creating multi-platform viewports (e.g., Touch interfaces or desktop browsers):</p>
+                    <ul>
+                        <li>Maintain interactive touch surfaces at minimum <strong>44 &times; 44 pixels</strong>.</li>
+                        <li>Do not substitute semantic functional nodes (like structural buttons) with raw un-tabbable dividers.</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <section class="bg-alt">
+            <div class="container" id="data-endpoint" style="max-width: 650px;">
+                <h3 class="section-title">Standard Data Entry Object</h3>
+                <p class="section-desc" style="margin-bottom: 1.5rem;">A baseline structural form passing inputs back through the local reverse proxy rules setup within your infrastructure configurations.</p>
+                
+                <form action="/api/submit" method="POST">
+                    <div class="form-group">
+                        <label for="form-key-id">Entity Identification Token</label>
+                        <input type="text" id="form-key-id" name="key_id" required aria-required="true">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="form-payload">System Stream Input Payload</label>
+                        <span id="field-instruction" style="font-size: 0.85rem; opacity: 0.8; display: block; margin-bottom: 0.35rem;">
+                            Instruction block linked directly using explicit programmatic mapping targets.
+                        </span>
+                        <input type="text" id="form-payload" name="system_payload" aria-describedby="field-instruction" required>
+                    </div>
+
+                    <button type="submit" class="btn" style="width: 100%;">Execute Service Dispatch</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>System Engine License: <strong>GNU Affero General Public License (AGPL-3.0)</strong></p>
+            <p>The code repository below houses full operational assets, source deployment instructions, and backend configurations.</p>
+            <p style="margin-top: 1rem;">
+                <a href="https://github.com/youruser/repo" rel="noopener" target="_blank">
+                    Access Public Source Distribution & Repository Logs
+                </a>
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

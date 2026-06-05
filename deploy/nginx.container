@@ -1,0 +1,9 @@
+[Container]
+Image=docker.io/library/nginx:alpine
+Network=app-network
+# Expose standard web ports to the public internet
+PublishPort=80:80
+PublishPort=443:443
+# Mount the Nginx config file and the static frontend folder from the host
+Volume=/etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+Volume=/var/www/frontend:/usr/share/nginx/html:ro

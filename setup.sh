@@ -10,9 +10,19 @@
 set -euo pipefail
 
 # Define operational paths
-QUADLET_DIR="/etc/containers/systemd"
-ENV_DIR="/etc/containers"
-WEB_DIR="/var/www/frontend"
+deploy_dir="deploy"             # folder for deploy files
+frontend_dir="frontend-web"     # folder for light front end web files
+backend_dir="backend"           # folder for backend service files
+
+QUADLET_DIR="/etc/containers/systemd"   #folder to deploy podman files and systemd units
+ENV_DIR="/etc/containers"               #folder to deploy .env and configuration files
+WEB_DIR="/var/www/frontend"             #folder to deploy frontend
+
+discovered_pods=()
+discovered_networks=()
+discovered_volumes=()
+discovered_containers=()
+discovered_envs=()
 
 echo "=== [1/6] Verifying System Prerequisites ==="
 if [ "$EUID" -ne 0 ]; then
@@ -31,42 +41,132 @@ mkdir -p "$WEB_DIR"
 
 echo "=== [4/6] Provisioning Asset Distributions ==="
 # 1. Copy the Podman Quadlet configuration definitions
-if [ -d "deploy" ]; then
+if [ -d "$deploy_dir" ]; then
     echo "📋 Staging Quadlet service specifications..."
-    cp deploy/*.container "$QUADLET_DIR/" 2>/dev/null || echo "ℹ️ No .container files found yet."
-    cp deploy/*.network "$QUADLET_DIR/" 2>/dev/null || echo "ℹ️ No .network files found yet."
-    cp deploy/*.volume "$QUADLET_DIR/" 2>/dev/null || echo "ℹ️ No .volume files found yet."
-    cp deploy/nginx.conf "$ENV_DIR/nginx.conf" 2>/dev/null || echo "ℹ️ No nginx.conf file found yet."
+
+    ( #find and migrate containers
+        end=".container"
+        srv="-container.service"
+        for file in $deploy_dir/*$end; do
+            if [-f "$file"]; then
+                base=$(basename "$file")
+                service=${base/"$end"/"$srv"}
+                discovered_containers+=($service)
+                cp "$file" "$QUADLET_DIR/" 1> /dev/null || echo "copying $file to $QUADLET_DIR"
+            else
+                echo "$file is not a file?"
+            fi
+        done
+    )
+    ( #find and migrate networks
+        end=".network"
+        srv="-network.service"
+        for file in $deploy_dir/*$end; do
+            if [-f "$file"]; then
+                base=$(basename "$file")
+                service=${base/"$end"/"$srv"}
+                discovered_networks+=($service)
+                cp "$file" "$QUADLET_DIR/" 1> /dev/null || echo "copying $file to $QUADLET_DIR"
+            else
+                echo "$file is not a file?"
+            fi
+        done
+    )
+    ( #find and migrate volumes
+        end=".volume"
+        srv="-volume.service"
+        for file in $deploy_dir/*$end; do
+            if [-f "$file"]; then
+                base=$(basename "$file")
+                service=${base/"$end"/"$srv"}
+                discovered_volumes+=($service)
+                cp "$file" "$QUADLET_DIR/" 1> /dev/null || echo "copying $file to $QUADLET_DIR"
+            else
+                echo "$file is not a file?"
+            fi
+        done
+    )
+    ( #find and migrate pods
+        end=".pod"
+        srv="-pod.service"
+        for file in $deploy_dir/*$end; do
+            if [-f "$file"]; then
+                base=$(basename "$file")
+                service=${base/"$end"/"$srv"}
+                discovered_pods+=($service)
+                cp "$file" "$QUADLET_DIR/" 1> /dev/null || echo "copying $file to $QUADLET_DIR"
+            else
+                echo "$file is not a file?"
+            fi
+        done
+    )
+
+    # find and migrate the nginx file if it exists
+    cp $deploy_dir/nginx.conf "$ENV_DIR/nginx.conf" 2>/dev/null || echo "ℹ️ No nginx.conf file found yet."
     
     # 2. Safely initialize environment configuration without overwriting existing files
-    if [ ! -f "$ENV_DIR/app.env" ]; then
-        echo "🔑 Provisioning fresh environment template at $ENV_DIR/app.env"
-        cp deploy/app.env.tmpl "$ENV_DIR/app.env"
-        chmod 600 "$ENV_DIR/app.env" # Restrict read/write privileges strictly to root
-    else
-        echo "⚠️  Existing runtime environment file discovered at $ENV_DIR/app.env. Skipping configuration override."
-    fi
+    
+    
+    ( #find and migrate .env files
+        end=".env.tmpl"
+        srv=".env"
+        for file in $deploy_dir/*$end; do
+            if [-f "$file"]; then
+                base=$(basename "$file")
+                real="${base/"$end"/"$srv"}"
+                discovered_pods+=($real)
+                
+                if [ ! -f "$ENV_DIR/$target_name" ]; then
+                    cp $file "$ENV_DIR/$real" 1> /dev/null || echo "copying $file to $ENV_DIR as $real"
+                    chmod 600 "$ENV_DIR/$target_name" # Restrict read/write privileges strictly to root
+                else
+                    echo "⚠️  Existing runtime environment file discovered at $ENV_DIR/$real. Skipping configuration override."
+                    echo "\t to force copy run the commands:"
+                    echo "cp \"$file $ENV_DIR/$real\" #copying the file"
+                    echo "chmod 600 \"$ENV_DIR/$target_name\" # Restrict read/write privileges strictly to root"
+                fi
+            else
+                echo "$file is not a file?"
+            fi
+        done
+    )
+
+    
 else
-    echo "❌ Error: Required directory 'deploy/' not found in working path." >&2
+    echo "❌ Error: Required directory '$deploy_dir/' not found in working path." >&2
     exit 1
 fi
 
 # 3. Mount the universal user interface to the web root
-if [ -d "frontend-web" ] && [ -f "frontend-web/index.html" ]; then
+if [ -d "$frontend_dir" ] && [-f "$frontend_dir/*.html"]; then
     echo "🌐 Copying static web user interface assets to $WEB_DIR..."
-    cp -r frontend-web/* "$WEB_DIR/"
+    cp -r "$frontend_dir/*" "$WEB_DIR/"
 else
-    echo "ℹ️ Note: Standard 'frontend-web/index.html' structure not located. Skipping web asset staging."
+    echo "ℹ️ Note: Standard 'frontend-web/*.html' structure not located. Skipping web asset staging."
 fi
 
 echo "=== [5/6] Triggering Systemd Engine Re-Read ==="
-# Forces systemd to process the new Quadlet files and generate transient units
+# Forces systemd to process the new quadlet, pods, volumes, and network files and generate transient units
 systemctl daemon-reload
 
 echo "=== [6/6] Initializing Background Services ==="
-# Note: Podman Quadlets automatically generate systemd service targets matching filename.service
+# Note: Podman Quadlets, volumes, pods, and networks automatically
+# generate systemd service targets matching filename.service
 echo "syncing network and runtime configurations..."
-systemctl enable --now app.network || echo "ℹ️ Network target pending runtime generation."
+
+for net_file in $deploy_dir/*.network; do
+    if [-f "$net_file"]; then
+        net_base$(basename "$net_file")
+        net_service=${net_base/.network/-network.service}
+        echo "🌐 Starting network: $net_service"
+        systemctl --user enable --now "$net_service"
+    fi
+done
+
+for pod_file in "$deploy_dir/*.pod"; do
+    if [ -f "$pod_file" ]; then
+        pod_base=$(basename "$pod_file")
+        pod_service="${pod_base/.pod/-pod.service}"
 
 echo "=============================================================================="
 echo "✅ Operational Setup Sequence Concluded Successfully."

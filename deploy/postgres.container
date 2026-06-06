@@ -1,7 +1,0 @@
-# deploy/postgres.container
-[Container]
-Image=docker.io/library/postgres:16-alpine
-EnvironmentFile=/etc/containers/app.env
-
-# This links our shared volume to the internal Postgres socket directory
-Volume=postgres-socket:/var/run/postgresql

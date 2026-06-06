@@ -1,0 +1,19 @@
+[Unit]
+Description=Travel log backend
+After=travel-log-pod.service travel-log-postgres-container.service travel-log-network.service
+Requires=travel-log-pod.service travel-log-postgres-container.service travel-log-network.service
+
+[Container]
+Image=quay.io/yourusername/my-backend:latest
+EnvironmentFile=/etc/containers/app.env
+Network=travel-log-network
+# We don't expose ports to the public internet here. Only Nginx can touch it.
+
+# This attaches the backend to the exact same hidden volume space
+Volume=postgres-socket:/run/postgres
+Pod=travel-log.pod
+
+
+
+
+    

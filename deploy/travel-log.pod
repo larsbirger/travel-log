@@ -1,0 +1,9 @@
+[Unit]
+Description=Travel log
+After=travel-log-network.service
+Requires=travel-log-network.service
+
+[Pod]
+PodName=travel-log-stack
+PublishPort=80:80
+PublishPort=443:443

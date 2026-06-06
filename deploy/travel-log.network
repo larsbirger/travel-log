@@ -1,0 +1,6 @@
+[Unit]
+Description=Internal Bridge Network for Travel Log application
+
+
+[Network]
+NetworkName=travel-log-network

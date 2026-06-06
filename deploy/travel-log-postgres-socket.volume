@@ -1,0 +1,6 @@
+[Unit]
+Description=travel log's postgress socket volume
+
+# deploy/postgres-socket.volume
+[Volume]
+VolumeName=travel-log-postgres-socket

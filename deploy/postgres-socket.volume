@@ -1,3 +1,0 @@
-# deploy/postgres-socket.volume
-[Volume]
-VolumeName=postgres-socket

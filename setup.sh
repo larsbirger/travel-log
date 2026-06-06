@@ -35,6 +35,7 @@ if [ -d "deploy" ]; then
     echo "📋 Staging Quadlet service specifications..."
     cp deploy/*.container "$QUADLET_DIR/" 2>/dev/null || echo "ℹ️ No .container files found yet."
     cp deploy/*.network "$QUADLET_DIR/" 2>/dev/null || echo "ℹ️ No .network files found yet."
+    cp deploy/*.volume "$QUADLET_DIR/" 2>/dev/null || echo "ℹ️ No .volume files found yet."
     cp deploy/nginx.conf "$ENV_DIR/nginx.conf" 2>/dev/null || echo "ℹ️ No nginx.conf file found yet."
     
     # 2. Safely initialize environment configuration without overwriting existing files

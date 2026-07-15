@@ -1,0 +1,32 @@
+{
+  "name": "travel-log-backend",
+  "version": "1.0.0",
+  "description": "backend for travel log software",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js",
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/larsbirger/travel-log.git"
+  },
+  "keywords": [
+    "logg",
+    "travel",
+    "cost",
+    "calculation"
+  ],
+  "author": "Lars Birger Bergmål",
+  "license": "AGPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/larsbirger/travel-log/issues"
+  },
+  "homepage": "https://github.com/larsbirger/travel-log#readme",
+  "dependencies": {
+    "@fastify/autoload": "^6.4.0",
+    "fastify": "^5.10.0",
+    "pg": "^8.22.0"
+  }
+}

@@ -10,10 +10,7 @@ ImageTag=travel-log-backend:latest
 
 Exec=npm run dev
 EnvironmentFile=/etc/containers/app.env
-# Network=travel-log-network
-# We don't expose ports to the public internet here. Only Nginx can touch it.
 
-# This attaches the backend to the exact same hidden volume space
 Volume=postgres-socket:/run/postgres
 Pod=travel-log.pod
 

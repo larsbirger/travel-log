@@ -4,10 +4,13 @@ After=travel-log-pod.service travel-log-postgres-container.service travel-log-ne
 Requires=travel-log-pod.service travel-log-postgres-container.service travel-log-network.service
 
 [Container]
+
 Build=../backend
+ImageTag=travel-log-backend:latest
+
 Exec=npm run dev
 EnvironmentFile=/etc/containers/app.env
-Network=travel-log-network
+# Network=travel-log-network
 # We don't expose ports to the public internet here. Only Nginx can touch it.
 
 # This attaches the backend to the exact same hidden volume space

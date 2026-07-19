@@ -5,8 +5,8 @@ Requires=travel-log-pod.service travel-log-postgres-container.service travel-log
 
 [Container]
 
-Build=../backend
-ImageTag=travel-log-backend:latest
+Build=travel-log-backend.build
+Image=localhost/travel-log-backend:latest
 
 Exec=npm run dev
 EnvironmentFile=/etc/containers/app.env

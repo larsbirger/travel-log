@@ -162,7 +162,7 @@ for net_file in "$deploy_dir"/*.network; do
         net_base=$(basename "$net_file")
         net_service=${net_base/.network/-network.service}
         echo "🌐 Starting network: $net_service"
-        systemctl enable --now "$net_service"
+        systemctl restart "$net_service"
     fi
 done
 
@@ -171,7 +171,7 @@ for pod_file in "$deploy_dir"/*.pod; do
         pod_base=$(basename "$pod_file")
         pod_service="${pod_base/.pod/-pod.service}"
         echo "📦 Starting tracking pod: $pod_service"
-        systemctl enable --now "$pod_service"
+        systemctl restart "$pod_service"
     fi
 done
 

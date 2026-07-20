@@ -1,7 +1,7 @@
 [Unit]
 Description=Travel log backend
-After= travel-log-postgres-container.service travel-log-network.service travel-log-postgres-socket-volume.service
-Requires= travel-log-postgres-container.service travel-log-network.service travel-log-postgres-socket-volume.service
+After= travel-log-postgres.service travel-log-network.service travel-log-postgres-socket-volume.service
+Requires= travel-log-postgres.service travel-log-network.service travel-log-postgres-socket-volume.service
 
 [Container]
 

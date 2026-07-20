@@ -4,4 +4,4 @@ ImageTag=localhost/travel-log-backend:latest
 File=%h/travel-log/backend/Containerfile
 
 # Add this line to bypass the image cache check:
-Force=true
+# Force=true

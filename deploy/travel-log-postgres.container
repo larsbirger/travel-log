@@ -6,7 +6,7 @@ Requires=travel-log-postgres-socket-volume.service
 
 [Container]
 Image=docker.io/library/postgres:16-alpine
-EnvironmentFile=/etc/containers/app.env
+EnvironmentFile=/etc/containers/travel-log.env
 Volume=travel-log-db-data:/var/lib/postgresql/data:Z
 Pod=travel-log.pod
 

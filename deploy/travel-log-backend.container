@@ -8,7 +8,7 @@ Requires= travel-log-postgres.service travel-log-network.service travel-log-post
 Image=travel-log-backend
 
 Exec=npm run dev
-EnvironmentFile=/etc/containers/app.env
+EnvironmentFile=/etc/containers/travel-log.env
 
 Volume=postgres-socket:/run/postgres
 Pod=travel-log.pod

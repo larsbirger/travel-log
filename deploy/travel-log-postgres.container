@@ -1,8 +1,8 @@
 # deploy/postgres.container
 [Unit]
 Description=Travel Log PostgreSQL Database
-After=travel-log-pod.service travel-log-volume.service
-Requires=travel-log-pod.service travel-log-volume.service 
+After=travel-log-postgres-socket-volume.service
+Requires=travel-log-postgres-socket-volume.service
 
 [Container]
 Image=docker.io/library/postgres:16-alpine

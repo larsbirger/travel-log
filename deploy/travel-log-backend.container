@@ -5,7 +5,7 @@ Requires= travel-log-postgres.service travel-log-network.service travel-log-post
 
 [Container]
 
-Image=travel-log-backend
+Image=localhost/travel-log-backend:latest
 
 Exec=npm run dev
 EnvironmentFile=/etc/containers/travel-log.env

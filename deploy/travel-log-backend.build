@@ -1,6 +1,6 @@
 [Build]
 ImageTag=localhost/travel-log-backend:latest
-Context=%h/travel-log/backend
+BuildDir=%h/travel-log/backend
 File=Containerfile
 # Add this line to bypass the image cache check:
 Force=true

@@ -24,6 +24,7 @@ NGINX_SITES_ENABLED="/etc/nginx/sites-enabled"
 
 discovered_pods=()
 discovered_builds=()
+discovered_envs=()
 discovered_networks=()
 discovered_volumes=()
 discovered_containers=()
@@ -201,6 +202,7 @@ if [ -d "$deploy_dir" ]; then
     for file in "$deploy_dir"/*.env.tmpl; do
         if [ -f "$file" ]; then
             base=$(basename "$file")
+            discovered_envs+=("$base")
             real="${base/.env.tmpl/.env}"
             
             if [ ! -f "$ENV_DIR/$real" ]; then

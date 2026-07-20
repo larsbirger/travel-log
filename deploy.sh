@@ -49,7 +49,17 @@ fi
 if [ "$TEARDOWN_MODE" = true ]; then
     echo "=== [1/4] Stopping Active Quadlet Services ==="
     if [ -d "$deploy_dir" ]; then
-        # 1. Bring down active pods first
+        # 1. Bring down active containers first
+        for file in "$deploy_dir"/*.container; do
+            if [ -f "$file" ]; then
+                base=$(basename "$file")
+                service="${base/.container/.service}"
+                echo "🛑 Stopping application container: $service"
+                systemctl stop "$service" || true
+            fi
+        done
+
+        # 2. Bring down active pods
         for file in "$deploy_dir"/*.pod; do
             if [ -f "$file" ]; then
                 base=$(basename "$file")
@@ -59,7 +69,7 @@ if [ "$TEARDOWN_MODE" = true ]; then
             fi
         done
 
-        # 2. Drop active networks
+        # 3. Drop active networks
         for file in "$deploy_dir"/*.network; do
             if [ -f "$file" ]; then
                 base=$(basename "$file")
@@ -113,10 +123,9 @@ if [ "$TEARDOWN_MODE" = true ]; then
 fi
 
 # ==============================================================================
-# BRANCH: SETUP LOGIC (Your core loop flow)
+# BRANCH: SETUP LOGIC
 # ==============================================================================
 echo "=== [1/6] Verifying System Prerequisites ==="
-# Already validated near the top
 
 echo "=== [2/6] Synchronizing Repositories & Installing Core Infrastructure ==="
 apt-get update
@@ -190,6 +199,9 @@ if [ -d "$deploy_dir" ]; then
         ABS_CONF_PATH=$(realpath "$deploy_dir/nginx/travel-log.conf")
         TARGET_LINK="$NGINX_SITES_ENABLED/travel-log.conf"
         
+        # Remove default Debian site if present to prevent port 80 collisions
+        rm -f "$NGINX_SITES_ENABLED/default"
+
         if [ -L "$TARGET_LINK" ] || [ -f "$TARGET_LINK" ]; then
             rm -f "$TARGET_LINK"
         fi
@@ -231,21 +243,33 @@ systemctl daemon-reload
 echo "=== [6/6] Initializing Background Services ==="
 echo "syncing network and runtime configurations..."
 
+# 1. Start networks
 for net_file in "$deploy_dir"/*.network; do
     if [ -f "$net_file" ]; then
         net_base=$(basename "$net_file")
-        net_service=${net_base/.network/-network.service}
+        net_service="${net_base/.network/-network.service}"
         echo "🌐 Starting network: $net_service"
         systemctl restart "$net_service"
     fi
 done
 
+# 2. Start pods
 for pod_file in "$deploy_dir"/*.pod; do
     if [ -f "$pod_file" ]; then
         pod_base=$(basename "$pod_file")
         pod_service="${pod_base/.pod/-pod.service}"
         echo "📦 Starting tracking pod: $pod_service"
         systemctl restart "$pod_service"
+    fi
+done
+
+# 3. Explicitly start Quadlet containers
+for container_file in "$deploy_dir"/*.container; do
+    if [ -f "$container_file" ]; then
+        container_base=$(basename "$container_file")
+        container_service="${container_base/.container/.service}"
+        echo "🚀 Starting application container: $container_service"
+        systemctl restart "$container_service"
     fi
 done
 
